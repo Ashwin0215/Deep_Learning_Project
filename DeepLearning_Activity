@@ -38,3 +38,45 @@ for images, labels in train_dataset.take(1):
         plt.imshow(images[i].numpy().astype('uint8'))
         plt.title(train_dataset.class_names[labels[i]])
         plt.axis('off')
+# load a base model
+base_model = keras.applications.xception.Xception(input_shape=(224, 224, 3),
+                                                  weights='imagenet',
+                                                  include_top=False)
+     
+
+# create an input layer
+input = keras.layers.Input(shape=(224, 224, 3))
+
+# resize and preprocess input images
+resized_input = keras.layers.Resizing(224, 224)(input)
+preprocessed_input = keras.applications.xception.preprocess_input(resized_input)
+
+# add data augmentation layers to reduce overfitting and make data more diverse
+flip = keras.layers.RandomFlip('horizontal')(preprocessed_input)
+rotation = keras.layers.RandomRotation(0.2)(flip)
+zoom = keras.layers.RandomZoom(0.2)(rotation)
+
+# run preprocessed images through the base model
+base_model_output = base_model(zoom)
+
+# add a GlobalAveragePooling layer and a dropout layer to reduce overfitting
+avg = keras.layers.GlobalAveragePooling2D()(base_model_output)
+dropout = keras.layers.Dropout(0.2)(avg)
+
+# add a fully connected layer with 3 nodes since the dataset has 3 classes
+output = keras.layers.Dense(3, activation='softmax')(dropout)
+
+# create a model
+model = keras.Model(inputs=input, outputs=output)
+     
+
+for layer in base_model.layers:
+    layer.trainable = False
+     
+
+optimizer = keras.optimizers.Adam(learning_rate=0.0001)
+model.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer,
+              metrics=['accuracy'])
+     
+
+history = model.fit(train_dataset, epochs=10, validation_data=valid_dataset)
