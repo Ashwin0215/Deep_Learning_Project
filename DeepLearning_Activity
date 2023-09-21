@@ -47,26 +47,26 @@ base_model = keras.applications.xception.Xception(input_shape=(224, 224, 3),
 
 input = keras.layers.Input(shape=(224, 224, 3))
 
-# resize and preprocess input images
+
 resized_input = keras.layers.Resizing(224, 224)(input)
 preprocessed_input = keras.applications.xception.preprocess_input(resized_input)
 
-# add data augmentation layers to reduce overfitting and make data more diverse
+
 flip = keras.layers.RandomFlip('horizontal')(preprocessed_input)
 rotation = keras.layers.RandomRotation(0.2)(flip)
 zoom = keras.layers.RandomZoom(0.2)(rotation)
 
-# run preprocessed images through the base model
+
 base_model_output = base_model(zoom)
 
-# add a GlobalAveragePooling layer and a dropout layer to reduce overfitting
+
 avg = keras.layers.GlobalAveragePooling2D()(base_model_output)
 dropout = keras.layers.Dropout(0.2)(avg)
 
-# add a fully connected layer with 3 nodes since the dataset has 3 classes
+
 output = keras.layers.Dense(3, activation='softmax')(dropout)
 
-# create a model
+
 model = keras.Model(inputs=input, outputs=output)
      
 
