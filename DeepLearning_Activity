@@ -7,3 +7,26 @@ from tensorflow import keras
 import datetime, os
 from google.colab import drive
 drive.mount('/content/drive')
+
+batch_size = 32
+img_size = (224, 224)
+
+
+train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+    '/content/drive/MyDrive/shoeTypeClassifierDataset/training',
+     shuffle=True, batch_size=batch_size, image_size=img_size,
+    validation_split=0.2, subset='training', seed=42
+)
+
+valid_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+    '/content/drive/MyDrive/shoeTypeClassifierDataset/validation',
+    shuffle=True, batch_size=batch_size, image_size=img_size,
+    validation_split=0.2, subset='validation', seed=42
+)
+
+test_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+    '/content/drive/MyDrive/shoeTypeClassifierDataset/validation',
+    shuffle=True, batch_size=batch_size, image_size=img_size
+)
+class_names = train_dataset.class_names
+class_names
