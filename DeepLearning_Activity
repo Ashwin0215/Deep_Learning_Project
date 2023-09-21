@@ -38,13 +38,13 @@ for images, labels in train_dataset.take(1):
         plt.imshow(images[i].numpy().astype('uint8'))
         plt.title(train_dataset.class_names[labels[i]])
         plt.axis('off')
-# load a base model
+
 base_model = keras.applications.xception.Xception(input_shape=(224, 224, 3),
                                                   weights='imagenet',
                                                   include_top=False)
      
 
-# create an input layer
+
 input = keras.layers.Input(shape=(224, 224, 3))
 
 # resize and preprocess input images
