@@ -30,3 +30,11 @@ test_dataset = tf.keras.preprocessing.image_dataset_from_directory(
 )
 class_names = train_dataset.class_names
 class_names
+
+plt.figure(figsize=(12, 12))
+for images, labels in train_dataset.take(1):
+    for i in range(20):
+        ax = plt.subplot(4, 5, i + 1)
+        plt.imshow(images[i].numpy().astype('uint8'))
+        plt.title(train_dataset.class_names[labels[i]])
+        plt.axis('off')
