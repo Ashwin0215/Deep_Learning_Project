@@ -80,3 +80,30 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer,
      
 
 history = model.fit(train_dataset, epochs=10, validation_data=valid_dataset)
+model.evaluate(test_dataset)
+# take a batch of images from the test set and make a prediction
+image_batch, label_batch = test_dataset.as_numpy_iterator().next()
+predictions = model.predict_on_batch(image_batch)
+
+# apply an argmax since the model
+predictions = np.argmax(predictions, axis=-1)
+
+# print predicted and real labels
+print('Predictions:\n', predictions)
+print('Labels:\n', label_batch)
+
+# plot first 9 images with the predicted classes
+plt.figure(figsize=(10, 10))
+for i in range(9):
+  ax = plt.subplot(3, 3, i + 1)
+  plt.imshow(image_batch[i].astype("uint8"))
+  plt.title(class_names[predictions[i]])
+  plt.axis("off")
+def predict_image(img):
+  img_4d=img.reshape(-1,224,224,3)
+  prediction=model.predict(img_4d)[0]
+  return {class_names[i]: float(prediction[i]) for i in range(3)}
+image = gr.inputs.Image(shape=(224,224))
+label = gr.outputs.Label(num_top_classes=3)
+iface = gr.Interface(fn=predict_image, inputs=image, outputs=label,interpretation='default')
+iface.launch(debug=True,share=True)
